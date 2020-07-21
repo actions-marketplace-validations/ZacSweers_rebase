@@ -12,8 +12,8 @@ To configure the action simply add the following lines to your `.github/workflow
 
 ```yml
 on:
-  pull_request:
-    types: [labeled]
+  issue_comment:
+    types: [created]
 name: Automatic Merge
 jobs:
   rebase:
@@ -26,7 +26,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Automatic Rebase
-      uses: zacsweers/rebase@v2
+      uses: zacsweers/rebase@v2.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_COMMENT: ${{ github.event.comment.body }}
