@@ -1,4 +1,4 @@
-name: 'LabeledRebaseOrMerge'
+name: 'Branch Update Action'
 description: 'An action to rebase or merge PR branches'
 runs:
   using: 'docker'
