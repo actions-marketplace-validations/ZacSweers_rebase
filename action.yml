@@ -3,5 +3,6 @@ description: 'An action to rebase or merge PR branches'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-icon: git-merge
-color: blue
+branding:
+  icon: 'git-merge'
+  color: 'blue'
