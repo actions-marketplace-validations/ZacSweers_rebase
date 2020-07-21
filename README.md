@@ -26,7 +26,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Automatic Rebase
-      uses: zacsweers/rebase@a841334683451e022997e0b5600767ab81bf099d
+      uses: zacsweers/rebase@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_COMMENT: ${{ github.event.comment.body }}
