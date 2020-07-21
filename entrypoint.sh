@@ -78,7 +78,23 @@ git fetch fork $HEAD_BRANCH
 
 # do the rebase
 git checkout -b $HEAD_BRANCH fork/$HEAD_BRANCH
-git rebase origin/$BASE_BRANCH
 
-# push back
-git push --force-with-lease fork $HEAD_BRANCH
+if [[ "$GITHUB_LABEL" == *"rebase"* ]]; then
+    # It's a rebase
+	git rebase origin/"$BASE_BRANCH"
+	# push back
+	git push --force-with-lease fork "$HEAD_BRANCH"
+elif [[ "$GITHUB_LABEL" == *"merge"* ]]; then
+    # It's a merge
+	git merge origin/"$BASE_BRANCH"
+	# push back
+	git push fork "$HEAD_BRANCH"
+else
+    echo "Not a merge or rebase! $GITHUB_LABEL"
+    exit 1
+fi
+
+# Remove the label
+curl -H "Authorization: bearer $GITHUB_TOKEN" -X POST -d " \
+{\"query\":\"mutation {\\n  removeLabelsFromLabelable(input:{labelIds:[\\\"$GITHUB_LABEL_ID\\\"],labelableId:\\\"$GITHUB_PR_ID\\\"}) {\\n clientMutationId\\n }\\n}\",\"variables\":{}} \
+" https://api.github.com/graphql

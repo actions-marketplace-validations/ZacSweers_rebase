@@ -1,9 +1,9 @@
 FROM alpine:latest
 
 LABEL version="1.0.0"
-LABEL repository="http://github.com/cirrus-actions/rebase"
-LABEL homepage="http://github.com/cirrus-actions/rebase"
-LABEL maintainer="Cirrus Labs"
+LABEL repository="http://github.com/ZacSweers/rebase"
+LABEL homepage="http://github.com/ZacSweers/rebase"
+LABEL maintainer="Zac Sweers"
 LABEL "com.github.actions.name"="Automatic Rebase"
 LABEL "com.github.actions.description"="Automatically rebases PR on '/rebase' comment"
 LABEL "com.github.actions.icon"="git-pull-request"

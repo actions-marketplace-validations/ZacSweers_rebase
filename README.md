@@ -1,35 +1,44 @@
-# GitHub action to automatically rebase PRs
+# GitHub action to automatically rebase or merge PRs
 
-[![Build Status](https://api.cirrus-ci.com/github/cirrus-actions/rebase.svg)](https://cirrus-ci.com/github/cirrus-actions/rebase) [![](https://images.microbadger.com/badges/version/cirrusactions/rebase.svg)](https://microbadger.com/images/cirrusactions/rebase) [![](https://images.microbadger.com/badges/image/cirrusactions/rebase.svg)](https://microbadger.com/images/cirrusactions/rebase)
+## This is a fork
 
-After installation simply comment `/rebase` to trigger the action:
+I made some changes here to support merging instead of just rebasing. Feature request is currently open on the original repo here: https://github.com/cirrus-actions/rebase/issues/56
 
-![rebase-action](https://user-images.githubusercontent.com/989066/51547853-14a57b00-1e35-11e9-841d-33114f0f0bd5.gif)
+After installation simply add a label containing `rebase` or `merge` to trigger the action. This will perform the action and then remove the label.
 
 # Installation
 
 To configure the action simply add the following lines to your `.github/workflows/rebase.yml` workflow file:
 
 ```yml
-on: 
-  issue_comment:
-    types: [created]
-name: Automatic Rebase
+on:
+  pull_request:
+    types: [labeled]
+name: Automatic Merge
 jobs:
-  rebase:
-    name: Rebase
-    if: github.event.issue.pull_request != '' && contains(github.event.comment.body, '/rebase')
+  merge:
+    name: Merge
+    if: contains(github.event.pull_request.labels.*.name, 'merge-pls') || contains(github.event.pull_request.labels.*.name, 'rebase-pls')
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout the latest code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Automatic Rebase
-      uses: cirrus-actions/rebase@1.3.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Checkout the latest code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Automatic Rebase
+        uses: zacsweers/rebase@9b5b45f10f297d69269ad4734a7cdd87b71cd7ce
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          GITHUB_LABEL: ${{ github.event.label.name }}
+          GITHUB_LABEL_ID: ${{ github.event.label.node_id }}
+          GITHUB_PR_ID: ${{ github.event.pull_request.node_id }}
 ```
+
+The label name must have either "rebase" or "merge" in the name to trigger the appropriate behavior.
 
 ## Restricting who can call the action
 
