@@ -16,26 +16,24 @@ on:
     types: [labeled]
 name: Automatic Merge
 jobs:
-  merge:
-    name: Merge
-    if: contains(github.event.pull_request.labels.*.name, 'merge-pls') || contains(github.event.pull_request.labels.*.name, 'rebase-pls')
+  rebase:
+    name: Rebase
+    if: github.event.issue.pull_request != '' && (contains(github.event.comment.body, '/rebase') || contains(github.event.comment.body, '/merge'))
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Checkout the latest code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Automatic Rebase
-        uses: zacsweers/rebase@9b5b45f10f297d69269ad4734a7cdd87b71cd7ce
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
-          GITHUB_LABEL: ${{ github.event.label.name }}
-          GITHUB_LABEL_ID: ${{ github.event.label.node_id }}
-          GITHUB_PR_ID: ${{ github.event.pull_request.node_id }}
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Automatic Rebase
+      uses: zacsweers/rebase@a841334683451e022997e0b5600767ab81bf099d
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_COMMENT: ${{ github.event.comment.body }}
+        # Optional, specify if you want it to hide or delete the merge comment
+        GITHUB_COMMENT_ID: ${{ github.event.comment.node_id }}
+        # Optional, requires GITHUB_COMMENT_ID. Can be either "hide" or "delete". Default is hide
+        GITHUB_COMMENT_ACTION: hide
 ```
 
 The label name must have either "rebase" or "merge" in the name to trigger the appropriate behavior.

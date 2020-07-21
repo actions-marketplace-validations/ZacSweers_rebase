@@ -79,22 +79,33 @@ git fetch fork $HEAD_BRANCH
 # do the rebase
 git checkout -b $HEAD_BRANCH fork/$HEAD_BRANCH
 
-if [[ "$GITHUB_LABEL" == *"rebase"* ]]; then
+if [[ $GITHUB_COMMENT == "/rebase" ]]; then
     # It's a rebase
 	git rebase origin/"$BASE_BRANCH"
 	# push back
 	git push --force-with-lease fork "$HEAD_BRANCH"
-elif [[ "$GITHUB_LABEL" == *"merge"* ]]; then
+elif [[ $GITHUB_COMMENT == "/merge" ]]; then
     # It's a merge
 	git merge origin/"$BASE_BRANCH"
 	# push back
 	git push fork "$HEAD_BRANCH"
 else
-    echo "Not a merge or rebase! $GITHUB_LABEL"
+    echo "Not a merge or rebase! $GITHUB_COMMENT"
     exit 1
 fi
 
-# Remove the label
-curl -H "Authorization: bearer $GITHUB_TOKEN" -X POST -d " \
-{\"query\":\"mutation {\\n  removeLabelsFromLabelable(input:{labelIds:[\\\"$GITHUB_LABEL_ID\\\"],labelableId:\\\"$GITHUB_PR_ID\\\"}) {\\n clientMutationId\\n }\\n}\",\"variables\":{}} \
-" https://api.github.com/graphql
+if [[ -z "${GITHUB_COMMENT_ID}" ]]; then
+	echo "Skipping comment hiding."
+else
+    if [[ $GITHUB_COMMENT_ACTION == "delete" ]]; then
+		# Delete the comment
+		curl -H "Authorization: bearer $GITHUB_TOKEN" -X POST -d " \
+		{\"query\":\"mutation {\\n  deleteIssueComment(input:{id:\\\"$GITHUB_COMMENT_ID\\\"}) {\\n clientMutationId\\n}\\n}\",\"variables\":{}} \
+		" https://api.github.com/graphql
+	else
+		# Minimize the comment as resolved
+		curl -H "Authorization: bearer $GITHUB_TOKEN" -X POST -d " \
+		{\"query\":\"mutation {\\n  minimizeComment(input:{subjectId:\\\"$GITHUB_COMMENT_ID\\\", classifier:RESOLVED}) {\\n    minimizedComment {\\n      minimizedReason\\n    }\\n  }\\n}\",\"variables\":{}} \
+		" https://api.github.com/graphql
+	fi
+fi
