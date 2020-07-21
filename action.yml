@@ -1,0 +1,6 @@
+# action.yml
+name: 'Rebase'
+description: 'An action to rebase or merge PR branches'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
