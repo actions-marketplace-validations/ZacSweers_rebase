@@ -1,5 +1,4 @@
-# action.yml
-name: 'Rebase'
+name: 'LabeledRebaseOrMerge'
 description: 'An action to rebase or merge PR branches'
 runs:
   using: 'docker'
