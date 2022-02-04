@@ -1,3 +1,7 @@
+# ARCHIVED
+
+This has been implemented directly by GitHub and is now redundant - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-suggestions-to-update-pull-request-branches
+
 # GitHub action to automatically rebase or merge PRs
 
 ## This is a fork
